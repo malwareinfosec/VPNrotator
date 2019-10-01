@@ -45,7 +45,7 @@ Standard System utilities
 (type `ip link show` to reveal the name of your ethernet cards)
 
 
-\# The loopback network interface
+`\# The loopback network interface
 
 auto lo
 
@@ -54,19 +54,12 @@ iface lo inet loopback
 \# The bridged network interface
 
 allow-hotplug enp0s3
-
-iface enp0s3 inet static
-
+        iface enp0s3 inet static
         address 192.168.1.168
-        
         netmask 255.255.255.0
-        
         gateway 192.168.1.1
-        
         network 192.168.1.0
-        
         broadcast 192.168.1.255
-        
         dns-nameservers 1.1.1.1 1.0.0.1
 
 \# the internal-only network interface
@@ -76,7 +69,7 @@ iface enp0s8 inet static
         netmask 255.255.255.0
         network 192.168.3.0
         broadcast 192.168.3.255
-        dns-nameservers 1.1.1.1 1.0.0.1
+        dns-nameservers 1.1.1.1 1.0.0.1`
 
 
 ## 5) Edit /etc/sysctl.conf
