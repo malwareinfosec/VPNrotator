@@ -39,24 +39,34 @@ Standard System utilities
 
 ## 4) Configure /etc/network/interfaces
 
-nano /etc/network/interfaces
+`nano /etc/network/interfaces`
 
 ** Edit with the name of your ethernet cards and IP range **
-(type 'ip link show' to reveal the name of our ethernet cards)
+(type `ip link show` to reveal the name of your ethernet cards)
 
 
 \# The loopback network interface
+
 auto lo
+
 iface lo inet loopback
 
 \# The bridged network interface
+
 allow-hotplug enp0s3
+
 iface enp0s3 inet static
+
         address 192.168.1.168
+        
         netmask 255.255.255.0
+        
         gateway 192.168.1.1
+        
         network 192.168.1.0
+        
         broadcast 192.168.1.255
+        
         dns-nameservers 1.1.1.1 1.0.0.1
 
 \# the internal-only network interface
