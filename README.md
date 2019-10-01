@@ -32,7 +32,9 @@ Standard System utilities
 ## 3) Get updates
 
 - Get root (type su and enter)
+
 apt-get update
+
 apt-get install psmisc unzip openvpn
 
 ## 4) Configure /etc/network/interfaces
@@ -43,11 +45,11 @@ nano /etc/network/interfaces
 (type 'ip link show' to reveal the name of our ethernet cards)
 
 
-# The loopback network interface
+\# The loopback network interface
 auto lo
 iface lo inet loopback
 
-# The bridged network interface
+\# The bridged network interface
 allow-hotplug enp0s3
 iface enp0s3 inet static
         address 192.168.1.168
@@ -57,7 +59,7 @@ iface enp0s3 inet static
         broadcast 192.168.1.255
         dns-nameservers 1.1.1.1 1.0.0.1
 
-# the internal-only network interface
+\# the internal-only network interface
 allow-hotplug enp0s8
 iface enp0s8 inet static
         address 192.168.3.1
