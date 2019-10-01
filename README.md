@@ -44,11 +44,11 @@ Standard System utilities
 ** Edit with the name of your ethernet cards and IP range **
 (type `ip link show` to reveal the name of your ethernet cards)
 
-        \# The loopback network interface
+        # The loopback network interface
         auto lo
         iface lo inet loopback
 
-        \# The bridged network interface
+        # The bridged network interface
         allow-hotplug enp0s3
         iface enp0s3 inet static
         address 192.168.1.168
@@ -58,7 +58,7 @@ Standard System utilities
         broadcast 192.168.1.255
         dns-nameservers 1.1.1.1 1.0.0.1
 
-        \# the internal-only network interface
+        # the internal-only network interface
         allow-hotplug enp0s8
         iface enp0s8 inet static
         address 192.168.3.1
@@ -70,37 +70,39 @@ Standard System utilities
 
 ## 5) Edit /etc/sysctl.conf
 
-nano /etc/sysctl.conf
+`nano /etc/sysctl.conf`
 
-Uncomment net.ipv4.ip_forward=1
-Uncomment (if you want to enable IPv6) net.ipv6.conf.all.forwarding=1
+Uncomment `net.ipv4.ip_forward=1`
+Uncomment (if you want to enable IPv6) `net.ipv6.conf.all.forwarding=1`
 
 Add the following at the end of the file if you want to disable IPV6
 
-# These edits EXPLICITLY disable IPV6
+`# These edits EXPLICITLY disable IPV6
 net.ipv6.conf.all.disable_ipv6 = 0
 net.ipv6.conf.default.disable_ipv6 = 0
 net.ipv6.conf.lo.disable_ipv6 = 0
-net.ipv6.conf.eth0.disable_ipv6 = 0
+net.ipv6.conf.eth0.disable_ipv6 = 0`
 
 
 ## 6) Copy necessary files
 
 (individually or simply ZIP them and then SCP)
 
-scp countries.txt vpn@192.168.1.168:/home/vpn/
+`scp countries.txt vpn@192.168.1.168:/home/vpn/
 scp dn.sh vpn@192.168.1.168:/home/vpn/
 scp up.sh vpn@192.168.1.168:/home/vpn/
 scp VPN.sh vpn@192.168.1.168:/home/vpn/
-scp vpnservice.sh vpn@192.168.1.168:/home/vpn/
+scp vpnservice.sh vpn@192.168.1.168:/home/vpn/`
 
-chmod +x *.sh
+Make scripts executable
+
+`chmod +x *.sh`
 
 ## 7) Reboot VM
 
-/sbin/reboot
+`/sbin/reboot`
 
 ## 8) Launch VPN rotator
 
-Login as root then, run ./VPN.sh
+Login as root then, run `./VPN.sh`
 
