@@ -33,9 +33,9 @@ Standard System utilities
 
 - Get root (type su and enter)
 
-apt-get update
+`apt-get update`
 
-apt-get install psmisc unzip openvpn
+`apt-get install psmisc unzip openvpn`
 
 ## 4) Configure /etc/network/interfaces
 
