@@ -2,10 +2,10 @@
 
 1) Create new VM
 
-Type: Linux
-Version: Debian (64-bit)
-Memory size: 512 MB
-Hard disk: VDI, Dynamic, 8 GB
+- Type: Linux
+- Version: Debian (64-bit)
+- Memory size: 512 MB (or more)
+- Hard disk: VDI, Dynamic, 8 GB
 
 - Before starting the VM, change its Network Settings:
 -> Adapter 1: Bridged Adapter (Promiscuous Mode: Deny)
