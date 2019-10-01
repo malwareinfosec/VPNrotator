@@ -1,6 +1,17 @@
+Brazil,br
 Canada,ca,CA_,CA-
+Denmark,dk
 France,fr,FR-
 Germany,de,DE-,Ger
 Italy,it,IT-
+India,in
+Ireland,ie
+Israel,il
+Japan,jp
+Mexico,mx
+Poland,pl
+South Korea,SouthKorea,sk
 Spain,es
+Switzerland,ch
+UK,uk
 US,us,USA
