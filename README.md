@@ -73,14 +73,19 @@ Standard System utilities
 `nano /etc/sysctl.conf`
 
 Uncomment `net.ipv4.ip_forward=1`
+
 Uncomment (if you want to enable IPv6) `net.ipv6.conf.all.forwarding=1`
 
 Add the following at the end of the file if you want to disable IPV6
 
 `# These edits EXPLICITLY disable IPV6
+
 net.ipv6.conf.all.disable_ipv6 = 0
+
 net.ipv6.conf.default.disable_ipv6 = 0
+
 net.ipv6.conf.lo.disable_ipv6 = 0
+
 net.ipv6.conf.eth0.disable_ipv6 = 0`
 
 
@@ -89,9 +94,13 @@ net.ipv6.conf.eth0.disable_ipv6 = 0`
 (individually or simply ZIP them and then SCP)
 
 `scp countries.txt vpn@192.168.1.168:/home/vpn/
+
 scp dn.sh vpn@192.168.1.168:/home/vpn/
+
 scp up.sh vpn@192.168.1.168:/home/vpn/
+
 scp VPN.sh vpn@192.168.1.168:/home/vpn/
+
 scp vpnservice.sh vpn@192.168.1.168:/home/vpn/`
 
 Make scripts executable
