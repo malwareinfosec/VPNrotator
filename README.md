@@ -1,6 +1,6 @@
 ## Readme ##
 
-1) Create new VM
+## 1) Create new VM
 
 - Type: Linux
 - Version: Debian (64-bit)
@@ -11,7 +11,7 @@
 -> Adapter 1: Bridged Adapter (Promiscuous Mode: Deny)
 -> Adapter 2: Internal Network (Promiscuous Mode: Allow VMs)
 
-2) Install Debian with the following options
+## 2) Install Debian with the following options
 
 - Download Debian ISO (debian-10.1.0-amd64-xfce-CD-1.iso)
 - Choose Install (second option)
@@ -29,13 +29,13 @@
 SSH server
 Standard System utilities
 
-2) Get updates
+## 3) Get updates
 
 - Get root (type su and enter)
 apt-get update
 apt-get install psmisc unzip openvpn
 
-3) Configure /etc/network/interfaces
+## 4) Configure /etc/network/interfaces
 
 nano /etc/network/interfaces
 
@@ -67,7 +67,7 @@ iface enp0s8 inet static
         dns-nameservers 1.1.1.1 1.0.0.1
 
 
-4) Edit /etc/sysctl.conf
+## 5) Edit /etc/sysctl.conf
 
 nano /etc/sysctl.conf
 
@@ -83,7 +83,7 @@ net.ipv6.conf.lo.disable_ipv6 = 0
 net.ipv6.conf.eth0.disable_ipv6 = 0
 
 
-5) Copy necessary files
+## 6) Copy necessary files
 
 (individually or simply ZIP them and then SCP)
 
@@ -95,11 +95,11 @@ scp vpnservice.sh vpn@192.168.1.168:/home/vpn/
 
 chmod +x *.sh
 
-6) Reboot VM
+## 7) Reboot VM
 
 /sbin/reboot
 
-7) Launch VPN rotator
+## 8) Launch VPN rotator
 
 Login as root then, run ./VPN.sh
 
