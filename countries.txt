@@ -1,0 +1,6 @@
+Canada,ca,CA_,CA-
+France,fr,FR-
+Germany,de,DE-,Ger
+Italy,it,IT-
+Spain,es
+US,us,USA
