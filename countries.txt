@@ -10,7 +10,7 @@ Israel,il
 Japan,jp
 Mexico,mx
 Poland,pl
-SouthKorea,sk
+SouthKorea,KR,kr
 Spain,es
 Switzerland,ch
 UK,uk
