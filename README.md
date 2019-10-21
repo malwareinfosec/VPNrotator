@@ -1,4 +1,4 @@
-## Readme ##
+## VPN ROTATOR README ##
 
 ![alt text](https://github.com/malwareinfosec/vpnrotator/blob/master/img/rotator_diagram.png)
 
