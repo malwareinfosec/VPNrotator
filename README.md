@@ -1,5 +1,7 @@
 ## Readme ##
 
+![alt text](https://github.com/malwareinfosec/vpnrotator/blob/master/img/rotator_diagram.png)
+
 ## 1) Create new VM
 
 - Type: Linux
