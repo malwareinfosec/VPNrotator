@@ -108,3 +108,4 @@ Make scripts executable
 
 Login as root then, run `./VPN.sh`
 
+![alt text](https://github.com/malwareinfosec/vpnrotator/blob/master/img/rotator.gif)
