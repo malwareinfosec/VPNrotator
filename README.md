@@ -70,7 +70,7 @@ Standard System utilities
         dns-nameservers 1.1.1.1 1.0.0.1
 
 
-## 5) Edit /etc/sysctl.conf
+## 5) Configure additional network settings
 
 `nano /etc/sysctl.conf`
 
@@ -85,6 +85,11 @@ Add the following at the end of the file if you want to disable IPV6
         net.ipv6.conf.default.disable_ipv6 = 0
         net.ipv6.conf.lo.disable_ipv6 = 0
         net.ipv6.conf.eth0.disable_ipv6 = 0
+
+Edit the vpnservice.sh file based on your network's gateway for the Internal NIC
+(in the example below, it assumes it is on 192.168.3.x)
+
+        iptables -A INPUT -s 192.168.3.0/24 -j DROP
 
 ## 6) Copy necessary files
 
