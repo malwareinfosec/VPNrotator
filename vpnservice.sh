@@ -203,8 +203,8 @@ vpn_path=$(pwd)
 # Set PATH variable
 export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
 
-# Disable traffic from victim 4.x to VPN 1.x
-iptables -A INPUT -s 192.168.4.0/24 -j DROP
+# Disable traffic from victim 3.x to VPN 1.x
+iptables -A INPUT -s 192.168.3.0/24 -j DROP
 
 if [ -f custom ];then rm custom;fi
 killOVPN
