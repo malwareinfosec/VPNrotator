@@ -113,6 +113,6 @@ Make scripts executable
 
 Login as root then, run `./VPN.sh`
 
-On first setup, you will need to create profiles to add new VPN providers. This requires the URL to a ZIP for .ovpn files and your username and password for that VPN provider. 
+On first setup, you will need to create profiles to add new VPN providers. This requires the URL to a ZIP for .ovpn files and your username and password for that VPN provider. The script will then download and sort all the .ovpn files automatically into folders by country and provider.
 
 ![alt text](https://github.com/malwareinfosec/vpnrotator/blob/master/img/rotator.gif)
