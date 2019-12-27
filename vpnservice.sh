@@ -5,7 +5,7 @@ refreshVPN () {
 # Clean up
 rm -r $vpn_path/ovpn_tmp/
 mkdir $vpn_path/ovpn_tmp
-rm $vpn_path/ovpn_files/
+rm -r $vpn_path/ovpn_files/
 mkdir $vpn_path/ovpn_files
 
 for profile in $(ls $vpn_path/vpn_profiles/*);do
