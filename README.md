@@ -1,6 +1,13 @@
 ## VPN ROTATOR ##
 
+A setup that puts one or more systems safely behind a VPN.
+
 ![alt text](https://github.com/malwareinfosec/vpnrotator/blob/master/img/rotator_diagram.png)
+
+## Requirements
+
+- Virtual or bare metal machine
+- One or more commercial VPN accounts
 
 ## 1) Create new VM
 
