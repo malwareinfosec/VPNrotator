@@ -43,13 +43,14 @@ else
 fi
 echo ""
 echo "1) Check VPN connection status"
-echo "2) Start VPN in new country"
-echo "3) Start VPN with new provider"
-echo "4) Rotate VPN"
-echo "5) Refresh VPN .ovpn files"
-echo "6) VPN profiles management"
-echo "7) Stop VPN (no internet connection)"
-echo "8) Quit VPN Rotator"
+echo "2) Start VPN from favorite location"
+echo "3) Start VPN in new country"
+echo "4) Start VPN with new provider"
+echo "5) Rotate VPN"
+echo "6) Refresh VPN .ovpn files"
+echo "7) VPN profiles management"
+echo "8) Stop VPN (no internet connection)"
+echo "9) Quit VPN Rotator"
 echo ""
 echo -n "Enter your choice and press [ENTER]: "
 }
@@ -67,6 +68,7 @@ echo ""
 echo "1) Create a new VPN profile"
 echo "2) Edit existing VPN profile(s)"
 echo "3) Delete existing VPN profile(s)"
+echo "4) Create/edit favorites"
 echo "0) Back to main menu"
 echo ""
 echo ""
@@ -76,6 +78,7 @@ read choice
 if [ $choice -eq 1 ];then setup_profiles;fi
 if [ $choice -eq 2 ];then edit_profiles;fi
 if [ $choice -eq 3 ];then delete_profiles;fi
+if [ $choice -eq 4 ];then edit_favorites;fi
 if [ $choice -eq 0 ];then 
     clear
     logo
@@ -273,14 +276,72 @@ else
 fi
 }
 
-choice_actions () {
-if [ $choice -eq 1 ];then
-    clear
-    logo
-    status
+choose_favorite () {
+clear
+logo
+if [ -f $vpn_path/favorites.txt ];then
+    echo "List of favorite VPN locations:"
+    number=1
+    cat $vpn_path/favorites.txt | while read line; do
+        echo "$number) $line"
+        number=$(($number + 1))
+    done
+    echo "0) Back to main menu"
+    echo ""
+    echo -n "Choose the one you wish to launch and press [ENTER]: "
+    read favoritenumber
+    if [ $favoritenumber -eq 0 ];then 
+        clear
+        logo
+        menu
+    else
+        while [ -f $vpn_path/custom ];do
+            clear
+            echo "VPN currently busy, please wait..."
+            sleep 2
+        done
+        sed ''"$favoritenumber"'q;d' $vpn_path/favorites.txt > $vpn_path/providers.txt
+        touch $vpn_path/custom
+        if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+    fi
+else
+    echo "Please create some favorites first by going into the 'VPN profiles management' menu"
+    echo ""
+    read -p "Press enter to continue"
 fi
+}
 
-if [ $choice -eq 2 ];then
+edit_favorites () {
+clear
+logo
+echo "** Instructions **"
+echo ""
+echo "# [VPN provider name],[.ovpn full name]"
+echo "# i.e. HMA,USA.TCP.ovpn"
+echo ""
+read -p "Press enter to continue"
+nano $vpn_path/favorites.txt
+}
+
+choice_actions () {
+    if [ $choice -eq 1 ];then
+        clear
+        logo
+        status
+    fi
+
+    if [ $choice -eq 2 ];then
+        choose_favorite
+        clear
+        logo
+        if [ -f $vpn_path/favorites.txt ];then
+            echo "Starting VPN in favorite location..."
+             sleep 15
+             status
+        fi
+    fi
+
+    if [ $choice -eq 3 ];then
         countryselection
         if [ $countrynumber -eq 0 ];then
             clear
@@ -293,7 +354,7 @@ if [ $choice -eq 2 ];then
         fi
     fi
 
-        if [ $choice -eq 3 ];then
+        if [ $choice -eq 4 ];then
                 providerselection
         if [ $providernumber -eq 0 ];then
             clear
@@ -306,7 +367,7 @@ if [ $choice -eq 2 ];then
         fi
         fi
 
-    if [ $choice -eq 4 ];then
+    if [ $choice -eq 5 ];then
             touch $vpn_path/rotate
         clear
         logo
@@ -315,18 +376,18 @@ if [ $choice -eq 2 ];then
         status
     fi
 
-    if [ $choice -eq 5 ];then
+    if [ $choice -eq 6 ];then
         clear
         logo
         refresh
         sleep 2
     fi
 
-    if [ $choice -eq 6 ];then
+    if [ $choice -eq 7 ];then
         vpnprofilemanagement
     fi
 
-    if [ $choice -eq 7 ];then
+    if [ $choice -eq 8 ];then
         clear
         logo
         echo "Stopping VPN..."
@@ -334,7 +395,7 @@ if [ $choice -eq 2 ];then
         sleep 10
     fi
 
-    if [ $choice -eq 8 ];then
+    if [ $choice -eq 9 ];then
         clear
         logo
         echo "Quitting VPN rotator..."
@@ -356,7 +417,7 @@ if [ $choice -eq 2 ];then
 killservice
 
 # VPN Rotation version number
-version_number=2.1
+version_number=2.2
 
 # Adjust time
 timedatectl set-ntp false
