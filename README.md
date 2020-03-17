@@ -44,7 +44,7 @@ Standard System utilities
 
 `apt-get update`
 
-`apt-get install psmisc unzip openvpn`
+`apt-get install psmisc unzip openvpn curl dos2unix`
 
 ## 4) Configure /etc/network/interfaces
 
