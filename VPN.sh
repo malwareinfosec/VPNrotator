@@ -89,16 +89,22 @@ fi
 countryselection () {
 clear
 logo
+echo ""
 echo "List of available countries (and nb of servers):"
+echo ""
 array_index=0
 number=1
+if [ -f $vpn_path/tempmenu.txt ];then rm $vpn_path/tempmenu.txt;fi
 for i in $(ls -d $vpn_path/ovpn_files/Country_*);do
     nbovpn=$(ls $i | wc -l)
-        echo "$number) $i ($nbovpn)" | sed 's@'"$vpn_path"'\/ovpn_files\/Country_@@g'
+    if [ $nbovpn -gt 0 ];then
+        echo "$number) $i ($nbovpn)" | sed 's@'"$vpn_path"'\/ovpn_files\/Country_@@g' >> $vpn_path/tempmenu.txt
         providers[$array_index]=$(echo $i | sed 's@'"$vpn_path"'\/ovpn_files\/@@g')
         number=$(($number + 1))
         array_index=$(($array_index + 1))
+    fi
 done
+pr -3 -t $vpn_path/tempmenu.txt
 echo "0) Back to main menu"
 echo ""
 echo -n "Enter your choice and press [ENTER]: "
@@ -131,7 +137,9 @@ fi
 providerselection () {
 clear
 logo
+echo ""
 echo "List of available providers (and nb of servers):"
+echo ""
 array_index=0
 number=1
 for i in $(ls -d $vpn_path/ovpn_files/* | grep -v "Country_");do
@@ -191,6 +199,7 @@ fi
 setup_profiles () {
 clear
 logo
+echo ""
 echo "Please enter the VPN provider's name (avoid spaces), followed by [ENTER]:"
 echo "(Example: HMA)"
 read vpn_name
@@ -227,7 +236,9 @@ refresh
 edit_profiles () {
 clear
 logo
+echo ""
 echo "List of existing VPN profiles:"
+echo ""
 number=1
 for i in $(ls -d $vpn_path/vpn_profiles/*);do
     nbprofiles=$(ls $i | wc -l)
@@ -251,7 +262,9 @@ fi
 delete_profiles () {
 clear
 logo
+echo ""
 echo "List of existing VPN profiles:"
+echo ""
 number=1
 for i in $(ls -d $vpn_path/vpn_profiles/*);do
     nbprofiles=$(ls $i | wc -l)
@@ -279,8 +292,10 @@ fi
 choose_favorite () {
 clear
 logo
+echo ""
 if [ -f $vpn_path/favorites.txt ];then
     echo "List of favorite VPN locations:"
+    echo ""
     number=1
     cat $vpn_path/favorites.txt | while read line; do
         echo "$number) $line"
@@ -290,11 +305,7 @@ if [ -f $vpn_path/favorites.txt ];then
     echo ""
     echo -n "Choose the one you wish to launch and press [ENTER]: "
     read favoritenumber
-    if [ $favoritenumber -eq 0 ];then 
-        clear
-        logo
-        menu
-    else
+    if [ $favoritenumber -gt 0 ];then 
         while [ -f $vpn_path/custom ];do
             clear
             echo "VPN currently busy, please wait..."
@@ -314,6 +325,7 @@ fi
 edit_favorites () {
 clear
 logo
+echo ""
 echo "** Instructions **"
 echo ""
 echo "# [VPN provider name],[.ovpn full name]"
@@ -332,12 +344,16 @@ choice_actions () {
 
     if [ $choice -eq 2 ];then
         choose_favorite
-        clear
-        logo
-        if [ -f $vpn_path/favorites.txt ];then
-            echo "Starting VPN in favorite location..."
-             sleep 15
-             status
+        if [ $favoritenumber -eq 0 ];then
+            clear
+        else
+            clear
+            logo
+            if [ -f $vpn_path/favorites.txt ];then
+                echo "Starting VPN in favorite location..."
+                sleep 15
+                status
+            fi
         fi
     fi
 
@@ -417,7 +433,7 @@ choice_actions () {
 killservice
 
 # VPN Rotation version number
-version_number=2.2
+version_number=2.3
 
 # Adjust time
 timedatectl set-ntp false

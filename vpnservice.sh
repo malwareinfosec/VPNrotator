@@ -3,8 +3,6 @@
 refreshVPN () {
 
 # Clean up
-rm -r $vpn_path/ovpn_tmp/
-mkdir $vpn_path/ovpn_tmp
 rm -r $vpn_path/ovpn_files/
 mkdir $vpn_path/ovpn_files
 
@@ -26,42 +24,49 @@ for profile in $(ls $vpn_path/vpn_profiles/*);do
         echo "Cleaning up old ovpn files for $vpn_name..."
         rm $vpn_path/ovpn_files/$vpn_name/*.ovpn
     fi
+	
+    # Cleanup and setup temp directory
+    echo "Delete temp folder..."
+    rm -r $vpn_path/ovpn_tmp/
+    echo "Create temp folder..."
+    mkdir $vpn_path/ovpn_tmp
 
-    # Download ovpn config files
-    echo "Downloading $vpn_name configs..."
-    wget --no-check-certificate -O $vpn_path/openvpn.zip $vpn_configs_url
+    if [ ! -z "$vpn_username" ] && [ ! -z "$vpn_password" ];then
+        # Download ovpn config files
+        echo "Downloading $vpn_name configs..."
+        wget --no-check-certificate -O $vpn_path/openvpn.zip $vpn_configs_url
 
-    # Unzip files
-    echo "Unzipping $vpn_name..."
-    unzip -q $vpn_path/openvpn.zip -d $vpn_path/ovpn_tmp
+        # Unzip files
+        echo "Unzipping $vpn_name..."
+        unzip -q $vpn_path/openvpn.zip -d $vpn_path/ovpn_tmp
 
-    # Clean up and move ovpn files
-    echo "Cleaning up and moving $vpn_name ovpn files..."
-    rm $vpn_path/openvpn.zip
-    # Check if ovpn files are in current folder
-    success=0
-    if ls $vpn_path/ovpn_tmp/*.ovpn >/dev/null 2>&1;then
-        echo "ovpn files in main folder"
-        success=1
-    else
-        # Check for TCP folder
-        echo "Checking for TCP folder to find ovpn files..."
-        tcp_folder_exists=$(ls -d $vpn_path/ovpn_tmp/*/ | grep -c -i tcp)
-        if [ $tcp_folder_exists -eq 1 ];then
-            cp $(ls -d $vpn_path/ovpn_tmp/*/ | grep -i tcp)/*.ovpn $vpn_path/ovpn_tmp/
+        # Clean up and move ovpn files
+        echo "Cleaning up and moving $vpn_name ovpn files..."
+        rm $vpn_path/openvpn.zip
+        # Check if ovpn files are in current folder
+        success=0
+        if ls $vpn_path/ovpn_tmp/*.ovpn >/dev/null 2>&1;then
+            echo "ovpn files in main folder"
             success=1
+        else
+            # Check for TCP folder
+            echo "Checking for TCP folder to find ovpn files..."
+            tcp_folder_exists=$(ls -d $vpn_path/ovpn_tmp/*/ | grep -c -i tcp)
+            if [ $tcp_folder_exists -eq 1 ];then
+                cp $(ls -d $vpn_path/ovpn_tmp/*/ | grep -i tcp)/*.ovpn $vpn_path/ovpn_tmp/
+                success=1
+            fi
         fi
-    fi
-    if [ $success -eq 1 ];then
-        echo "Renaming files with spaces..."
-        for f in $vpn_path/ovpn_tmp/*\ *; do mv "$f" "${f// /_}" >/dev/null 2>&1; done
-        echo "Moving ovpn files to $vpn_name folder..."
-        mv $vpn_path/ovpn_tmp/*.ovpn $vpn_path/ovpn_files/$vpn_name/
-        rm -r $vpn_path/ovpn_tmp/
+        if [ $success -eq 1 ];then
+            echo "Renaming files with spaces..."
+            for f in $vpn_path/ovpn_tmp/*\ *; do mv "$f" "${f// /_}" >/dev/null 2>&1; done
+            echo "Moving ovpn files to $vpn_name folder..."
+            mv $vpn_path/ovpn_tmp/*.ovpn $vpn_path/ovpn_files/$vpn_name/
+            rm -r $vpn_path/ovpn_tmp/
 
-    # Store user name and password
-    echo "Creating user.txt files with creds for $vpn_name..."
-    echo $vpn_username > $vpn_path/ovpn_files/$vpn_name/user.txt
+        # Store user name and password
+        echo "Creating user.txt files with creds for $vpn_name..."
+        echo $vpn_username > $vpn_path/ovpn_files/$vpn_name/user.txt
         echo $vpn_password >> $vpn_path/ovpn_files/$vpn_name/user.txt
 
         # Edit ovpn files with creds
@@ -71,10 +76,25 @@ for profile in $(ls $vpn_path/vpn_profiles/*);do
         for i in $(ls $vpn_path/ovpn_files/$vpn_name/*.ovpn);do echo "log $vpn_path/vpn.log" >> $i;done
         
         echo "Successfully imported $vpn_name profile!"
-    else
-        echo "Failed importing $vpn_name profile!"
-    fi
+        else
+            echo "Failed importing $vpn_name profile!"
+        fi
 
+    else
+        # Check for opensource VPN
+        echo "Downloading CSV file..."
+        curl $vpn_configs_url | dos2unix | tail -n +3 > $vpn_path/ovpn_tmp/configs.csv
+        uniqueid=$(date +%s)
+        echo "Parsing CSV file..."
+        while IFS='' read -r line || [[ -n "$line" ]];do
+            country=$(echo "$line" | awk -F ',' '{print $7}')
+            echo "$line" | awk -F ',' '{print $NF}' | base64 -d > $vpn_path/ovpn_tmp/$country-$uniqueid.ovpn 
+            echo "log /home/vpn/vpn.log" >> $vpn_path/ovpn_tmp/$country-$uniqueid.ovpn
+            uniqueid=$((uniqueid+1))
+        done < $vpn_path/ovpn_tmp/configs.csv
+        mv $vpn_path/ovpn_tmp/*.ovpn $vpn_path/ovpn_files/$vpn_name/
+        rm -r $vpn_path/ovpn_tmp/
+    fi
 done
 
 # Adding countries
