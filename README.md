@@ -88,6 +88,10 @@ Standard System utilities
 
 ## 5) Configure additional network settings
 
+`nano /etc/resolv.conf`
+
+Add `nameserver 192.168.0.1` (or whatever your local gateway is)
+
 `nano /etc/sysctl.conf`
 
 Uncomment `net.ipv4.ip_forward=1`
