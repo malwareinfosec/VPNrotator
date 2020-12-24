@@ -10,38 +10,38 @@ for profile in $(ls $vpn_path/vpn_profiles/*);do
 
     # Grab variable names
     vpn_name=$(grep 'vpn_name' $profile | awk -F '=' '{print $2}')
-    echo "Grabbing profile for $vpn_name..."
+    echo "Configuring profile for $vpn_name..." >> $vpn_path/refresh.log
     vpn_configs_url=$(grep 'vpn_configs_url' $profile | awk -F '=' '{print $2}')
     vpn_username=$(grep 'vpn_username' $profile | awk -F '=' '{print $2}')
     vpn_password=$(grep 'vpn_password' $profile | awk -F '=' '{print $2}')
 
     # Create ovpn_files directory if it does not exist
     if [ ! -d $vpn_path/ovpn_files/$vpn_name ];then
-        echo "Creating directory for $vpn_name..."
+        echo "Creating directory for $vpn_name..." >> $vpn_path/refresh.log
         mkdir $vpn_path/ovpn_files/$vpn_name
     else
         # Clean up
-        echo "Cleaning up old ovpn files for $vpn_name..."
+        echo "Cleaning up old ovpn files for $vpn_name..." >> $vpn_path/refresh.log
         rm $vpn_path/ovpn_files/$vpn_name/*.ovpn
     fi
 	
     # Cleanup and setup temp directory
-    echo "Delete temp folder..."
+    echo "Delete temp folder..." >> $vpn_path/refresh.log
     rm -r $vpn_path/ovpn_tmp/
-    echo "Create temp folder..."
+    echo "Create temp folder..." >> $vpn_path/refresh.log
     mkdir $vpn_path/ovpn_tmp
 
     if [ ! -z "$vpn_username" ] && [ ! -z "$vpn_password" ];then
         # Download ovpn config files
-        echo "Downloading $vpn_name configs..."
+        echo "Downloading $vpn_name configs..." >> $vpn_path/refresh.log
         wget --no-check-certificate -O $vpn_path/openvpn.zip $vpn_configs_url
 
         # Unzip files
-        echo "Unzipping $vpn_name..."
+        echo "Unzipping $vpn_name..." >> $vpn_path/refresh.log
         unzip -q $vpn_path/openvpn.zip -d $vpn_path/ovpn_tmp
 
         # Clean up and move ovpn files
-        echo "Cleaning up and moving $vpn_name ovpn files..."
+        echo "Cleaning up and moving $vpn_name ovpn files..." >> $vpn_path/refresh.log
         rm $vpn_path/openvpn.zip
         # Check if ovpn files are in current folder
         success=0
@@ -65,27 +65,29 @@ for profile in $(ls $vpn_path/vpn_profiles/*);do
             rm -r $vpn_path/ovpn_tmp/
 
         # Store user name and password
-        echo "Creating user.txt files with creds for $vpn_name..."
+        echo "Creating user.txt files with creds for $vpn_name..." >> $vpn_path/refresh.log
         echo $vpn_username > $vpn_path/ovpn_files/$vpn_name/user.txt
         echo $vpn_password >> $vpn_path/ovpn_files/$vpn_name/user.txt
 
         # Edit ovpn files with creds
-        echo "Editing $vpn_name files..."
+        echo "Editing $vpn_name files..." >> $vpn_path/refresh.log
         for i in $(ls $vpn_path/ovpn_files/$vpn_name/*.ovpn);do sed -i "s@auth-user-pass@auth-user-pass $vpn_path\/ovpn_files\/$vpn_name\/user.txt@g" $i;done
         for i in $(ls $vpn_path/ovpn_files/$vpn_name/*.ovpn);do echo "" >> $i;done
         for i in $(ls $vpn_path/ovpn_files/$vpn_name/*.ovpn);do echo "log $vpn_path/vpn.log" >> $i;done
         
-        echo "Successfully imported $vpn_name profile!"
+        echo "Successfully imported $vpn_name profile!" >> $vpn_path/refresh.log
+        echo "" >> $vpn_path/refresh.log
         else
-            echo "Failed importing $vpn_name profile!"
+            echo "Failed importing $vpn_name profile!" >> $vpn_path/refresh.log
+            echo "" >> $vpn_path/refresh.log
         fi
 
     else
         # Check for opensource VPN
-        echo "Downloading CSV file..."
+        echo "Downloading CSV file..." >> $vpn_path/refresh.log
         curl $vpn_configs_url | dos2unix | tail -n +3 > $vpn_path/ovpn_tmp/configs.csv
         uniqueid=$(date +%s)
-        echo "Parsing CSV file..."
+        echo "Parsing CSV file..." >> $vpn_path/refresh.log
         while IFS='' read -r line || [[ -n "$line" ]];do
             country=$(echo "$line" | awk -F ',' '{print $7}')
             echo "$line" | awk -F ',' '{print $NF}' | base64 -d > $vpn_path/ovpn_tmp/$country-$uniqueid.ovpn 
@@ -98,7 +100,7 @@ for profile in $(ls $vpn_path/vpn_profiles/*);do
 done
 
 # Adding countries
-echo "Sorting ovpn files by country..."
+echo "Sorting ovpn files by country..." >> $vpn_path/refresh.log
 for country in $(cat $vpn_path/countries.txt | awk -F ',' '{print $1}');do
     # Create folder if it does not exist
     if [ ! -d $vpn_path/ovpn_files/Country_$country ];then mkdir $vpn_path/ovpn_files/Country_$country;fi
@@ -114,7 +116,9 @@ for country in $(cat $vpn_path/countries.txt | awk -F ',' '{print $1}');do
     done
 done
 
-echo "All done!"
+echo "" >> $vpn_path/refresh.log
+echo "" >> $vpn_path/refresh.log
+echo "All done!" >> $vpn_path/refresh.log
 
 rm $vpn_path/refresh
 if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
@@ -131,10 +135,11 @@ stopVPN () {
     echo "Disconnecting VPN..."
     for i in {1..4}; do killall openvpn;done
         if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
-            while [ -f stop ];do
-                echo "VPN has been stopped, waiting for signal to restart it..."
-                sleep 2
-            done
+            #while [ -f stop ];do
+            #    echo "VPN has been stopped, waiting for signal to restart it..."
+            #    sleep 2
+            #done
+    rm currentvpn.txt
     rm stop
     increment
 }
@@ -224,8 +229,8 @@ vpn_path=$(pwd)
 # Set PATH variable
 export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"
 
-# Disable traffic from victim 3.x to VPN 1.x
-iptables -A INPUT -s 192.168.3.0/24 -j DROP
+# Disable traffic from victim to VPN
+/sbin/iptables -A INPUT -s $(cat $vpn_path/drop.txt) -j DROP
 
 if [ -f custom ];then rm custom;fi
 killOVPN

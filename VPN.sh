@@ -6,14 +6,19 @@ for pid in $(ps aux | grep vpnservice.sh | grep -v grep | awk -F ' ' '{print $2}
 
 refresh () {
     killOVPN
-    clear
-    logo
-    echo ""
-    echo "Refreshing VPN config files, please wait..."
+    echo "" > $vpn_path/refresh.log
     touch $vpn_path/refresh
     while [ -f $vpn_path/refresh ];do
-        sleep 2
+        clear
+        logo
+        echo "" 
+        echo "Refreshing VPN config files, please wait..."
+        cat $vpn_path/refresh.log
+        sleep 5
     done
+    cat $vpn_path/refresh.log
+    sleep 2
+    rm $vpn_path/refresh.log
 }
 
 stopVPN () {
@@ -30,6 +35,11 @@ killOVPN () {
 logo () {
 echo "#####################################"
 echo "######## VPN ROTATOR v.$version_number  #########"
+if [ -f $vpn_path/drop.txt ];then
+    echo "VPN gateway range: $(cat $vpn_path/drop.txt)"
+else
+    echo "IPTABLES is not configured properly!!!"
+fi
 echo "#####################################"
 }
 
@@ -176,12 +186,12 @@ if [ -f $vpn_path/currentvpn.txt ];then
     waittime=0
     while [ $errors -eq 0 ];do
         clear
-        echo "Waiting for connection ($waittime/30)..."
+        echo "Waiting for connection ($waittime/15)..."
         tail -5 $vpn_path/vpn.log
         sleep 2
         errors=$(tail -1 vpn.log | egrep -c '(Sequence Completed)')
         waittime=$((waittime +1))
-        if [ $waittime -eq 30 ];then
+        if [ $waittime -eq 15 ];then
             rm $vpn_path/currentvpn.txt
             rm $vpn_path/custom
             stopVPN
@@ -194,6 +204,20 @@ else
     echo "No connection to report yet, please try again in a few seconds..."
     sleep 2
 fi
+}
+
+setup_droprange () {
+clear
+logo
+echo ""
+echo "Set up IPTABLES to drop traffic"
+echo ""
+echo "Enter the IP range to drop traffic from, typically your VPN gateway range:"
+echo "i.e. 192.168.3.0/24"
+echo ""
+touch $vpn_path/drop.txt
+read -p "Press enter to continue..."
+nano $vpn_path/drop.txt
 }
 
 setup_profiles () {
@@ -350,8 +374,8 @@ choice_actions () {
             clear
             logo
             if [ -f $vpn_path/favorites.txt ];then
-                echo "Starting VPN in favorite location..."
-                sleep 15
+                echo "Starting VPN with $(cat $vpn_path/providers.txt)..."
+                sleep 5
                 status
             fi
         fi
@@ -365,7 +389,7 @@ choice_actions () {
             clear
             logo
             echo "Starting VPN in $countryname..."
-            sleep 15
+            sleep 5
             status
         fi
     fi
@@ -375,11 +399,11 @@ choice_actions () {
         if [ $providernumber -eq 0 ];then
             clear
         else
-                    clear
-                    logo
-                    echo "Starting VPN with $providername..."
-                    sleep 15
-                    status
+            clear
+            logo
+            echo "Starting VPN with $providername..."
+            sleep 5
+            status
         fi
         fi
 
@@ -388,7 +412,7 @@ choice_actions () {
         clear
         logo
         echo "Rotating within $(cat providers.txt | sed 's/Country_//g')..."
-        sleep 15
+        sleep 5
         status
     fi
 
@@ -408,7 +432,7 @@ choice_actions () {
         logo
         echo "Stopping VPN..."
         stopVPN
-        sleep 10
+        sleep 5
     fi
 
     if [ $choice -eq 9 ];then
@@ -416,7 +440,7 @@ choice_actions () {
         logo
         echo "Quitting VPN rotator..."
         stopVPN
-        sleep 10
+        sleep 5
         killservice
         clear
         if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
@@ -433,7 +457,7 @@ choice_actions () {
 killservice
 
 # VPN Rotation version number
-version_number=2.3
+version_number=2.4
 
 # Adjust time
 timedatectl set-ntp false
@@ -441,6 +465,11 @@ timedatectl set-ntp true
 
 # Assign current VPN directory based on where script runs from
 vpn_path=$(pwd)
+
+# Check that IPTABLE and drop range exist
+if [ ! -f $vpn_path/drop.txt ];then
+    setup_droprange
+fi
 
 # Check for VPN profiles and go through initial setup if needed
 if [ ! "$(ls -A $vpn_path/vpn_profiles)" ]; then
