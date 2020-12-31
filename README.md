@@ -9,7 +9,7 @@ This project is intended for security researchers and offers the following benef
 
 The VPN rotator is a VM (or physical machine) that sends and receives all the traffic going through your network. In other words, the devices that are behind it are isolated from the Internet. This provides a safe environment not exposing your (residential) ISP connection.
 
-This project found its name (VPN Rotator) in the act of rotating or cycling through VPN locations to reproduce malware traffic. As such, it is easy to rotate within countries for the same or multiple VPN providers. This allows you to add accounts for several different providers and seemlessly rotate within access points, wihtout having to use their proprietary software.
+This project found its name (VPN Rotator) in the act of rotating or cycling through VPN locations to reproduce malware traffic. As such, it is easy to rotate within countries for the same or multiple VPN providers. This allows you to add accounts for several different providers and seamlessly rotate within access points, without having to use their proprietary software.
 
 ![alt text](https://github.com/malwareinfosec/vpnrotator/blob/master/img/rotator_diagram.png)
 
