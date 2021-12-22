@@ -1,7 +1,7 @@
 #!/bin/bash
 
 killservice () {
-for pid in $(ps aux | grep vpnservice.sh | grep -v grep | awk -F ' ' '{print $2}');do kill -9 $pid; wait $pid 2>/dev/null;done
+    for pid in $(ps aux | grep vpnservice.sh | grep -v grep | awk -F ' ' '{print $2}');do kill -9 $pid; wait $pid 2>/dev/null;done
 }
 
 refresh () {
@@ -26,130 +26,129 @@ stopVPN () {
 }
 
 killOVPN () {
- echo "Killing OVPN..."
-        for i in {1..4}; do killall openvpn;done
-        if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
+    echo "Killing OVPN..."
+    for i in {1..4}; do killall openvpn;done
+    if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
 }
 
-
 logo () {
-echo "#####################################"
-echo "######## VPN ROTATOR v.$version_number  #########"
-if [ -f $vpn_path/drop.txt ];then
-    echo "VPN gateway range: $(cat $vpn_path/drop.txt)"
-else
-    echo "IPTABLES is not configured properly!!!"
-fi
-echo "#####################################"
+    echo "#####################################"
+    echo "######## VPN ROTATOR v.$version_number  #########"
+    if [ -f $vpn_path/drop.txt ];then
+        echo "VPN gateway range: $(cat $vpn_path/drop.txt)"
+    else
+        echo "IPTABLES is not configured properly!!!"
+    fi
+    echo "#####################################"
 }
 
 menu () {
-echo ""
-if [ -f $vpn_path/currentvpn.txt ];then
-    echo "Currently connected to: $(cat currentvpn.txt)"
+    echo ""
+    if [ -f $vpn_path/currentvpn.txt ];then
+        echo "Currently connected to: $(cat currentvpn.txt)"
         echo "Connection established on $(date)"
-else
-    echo "** Not currently connected to the VPN **"
-fi
-echo ""
-echo "1) Check VPN connection status"
-echo "2) Start VPN from favorite"
-echo "3) Start VPN in new country"
-echo "4) Start VPN in new city"
-echo "5) Start VPN with new provider"
-echo "6) Rotate VPN"
-echo "7) Refresh VPN .ovpn files"
-echo "8) VPN profiles management"
-echo "9) Stop VPN (no internet connection)"
-echo "10) Quit VPN Rotator"
-echo ""
-echo -n "Enter your choice and press [ENTER]: "
+    else
+        echo "** Not currently connected to the VPN **"
+    fi
+    echo ""
+    echo "1) Check VPN connection status"
+    echo "2) Start VPN from favorite"
+    echo "3) Start VPN in new country"
+    echo "4) Start VPN in new city"
+    echo "5) Start VPN with new provider"
+    echo "6) Rotate VPN"
+    echo "7) Refresh VPN .ovpn files"
+    echo "8) VPN profiles management"
+    echo "9) Stop VPN (no internet connection)"
+    echo "10) Update VPN Rotator"
+    echo "11) Quit VPN Rotator"
+    echo ""
+    echo -n "Enter your choice and press [ENTER]: "
 }
 
 vpnprofilemanagement () {
-clear
-logo
-echo ""
-if [ -f $vpn_path/currentvpn.txt ];then
-    echo "Currently connected to: $(cat currentvpn.txt)"
-else
-    echo "** Not currently connected to the VPN **"
-fi
-echo ""
-echo "1) Create a new VPN profile"
-echo "2) Edit existing VPN profile(s)"
-echo "3) Delete existing VPN profile(s)"
-echo "4) Create/edit favorites"
-echo "0) Back to main menu"
-echo ""
-echo ""
-echo -n "Enter your choice and press [ENTER]: "
-read choice
-
-if [ $choice -eq 1 ];then setup_profiles;fi
-if [ $choice -eq 2 ];then edit_profiles;fi
-if [ $choice -eq 3 ];then delete_profiles;fi
-if [ $choice -eq 4 ];then edit_favorites;fi
-if [ $choice -eq 0 ];then
     clear
     logo
-    menu
-fi
+    echo ""
+    if [ -f $vpn_path/currentvpn.txt ];then
+        echo "Currently connected to: $(cat currentvpn.txt)"
+    else
+        echo "** Not currently connected to the VPN **"
+    fi
+    echo ""
+    echo "1) Create a new VPN profile"
+    echo "2) Edit existing VPN profile(s)"
+    echo "3) Delete existing VPN profile(s)"
+    echo "4) Create/edit favorites"
+    echo "0) Back to main menu"
+    echo ""
+    echo ""
+    echo -n "Enter your choice and press [ENTER]: "
+    read choice
+    if [ $choice -eq 1 ];then setup_profiles;fi
+    if [ $choice -eq 2 ];then edit_profiles;fi
+    if [ $choice -eq 3 ];then delete_profiles;fi
+    if [ $choice -eq 4 ];then edit_favorites;fi
+    if [ $choice -eq 0 ];then
+        clear
+        logo
+        menu
+    fi
 }
 
 countryselection () {
-clear
-logo
-echo ""
-echo "List of available countries (and nb of servers):"
-echo ""
-array_index=0
-number=1
-if [ -f $vpn_path/tempmenu.txt ];then rm $vpn_path/tempmenu.txt;fi
-for i in $(ls -d $vpn_path/ovpn_files/Country_*);do
-    nbovpn=$(ls $i | wc -l)
-    if [ $nbovpn -gt 0 ];then
-        echo "$number) $i ($nbovpn)" | sed 's@'"$vpn_path"'\/ovpn_files\/Country_@@g' >> $vpn_path/tempmenu.txt
-        providers[$array_index]=$(echo $i | sed 's@'"$vpn_path"'\/ovpn_files\/@@g')
-        number=$(($number + 1))
-        array_index=$(($array_index + 1))
+    clear
+    logo
+    echo ""
+    echo "List of available countries (and nb of servers):"
+    echo ""
+    array_index=0
+    number=1
+    if [ -f $vpn_path/tempmenu.txt ];then rm $vpn_path/tempmenu.txt;fi
+    for i in $(ls -d $vpn_path/ovpn_files/Country_*);do
+        nbovpn=$(ls $i | wc -l)
+        if [ $nbovpn -gt 0 ];then
+            echo "$number) $i ($nbovpn)" | sed 's@'"$vpn_path"'\/ovpn_files\/Country_@@g' >> $vpn_path/tempmenu.txt
+            providers[$array_index]=$(echo $i | sed 's@'"$vpn_path"'\/ovpn_files\/@@g')
+            number=$(($number + 1))
+            array_index=$(($array_index + 1))
+        fi
+    done
+    pr -3 -t $vpn_path/tempmenu.txt
+    echo "0) Back to main menu"
+    echo ""
+    echo -n "Enter your choice and press [ENTER]: "
+    read countrynumber
+    re='^[0-9]+$'
+    if ! [[ $countrynumber =~ $re ]] ; then
+        echo "error: Not a number" >&2; countryselection
     fi
-done
-pr -3 -t $vpn_path/tempmenu.txt
-echo "0) Back to main menu"
-echo ""
-echo -n "Enter your choice and press [ENTER]: "
-read countrynumber
-re='^[0-9]+$'
-if ! [[ $countrynumber =~ $re ]] ; then
-   echo "error: Not a number" >&2; countryselection
-fi
-if (( countrynumber >= 1 && countrynumber < number ));then
-    # Selected country
-    providersindex=$(($countrynumber -1))
-    provider=${providers[$providersindex]}
-    countryname=$(echo $provider | sed 's/Country_//g')
-    # Check that the folder is not empty
-    if [ $(ls $vpn_path/ovpn_files/$provider | wc -l) -eq 0 ];then 
-        clear
-        echo "No VPN profiles in this folder!"
-        sleep 2
-        countrynumber=0
-    else
-        while [ -f $vpn_path/custom ];do
+    if (( countrynumber >= 1 && countrynumber < number ));then
+        # Selected country
+        providersindex=$(($countrynumber -1))
+        provider=${providers[$providersindex]}
+        countryname=$(echo $provider | sed 's/Country_//g')
+        # Check that the folder is not empty
+        if [ $(ls $vpn_path/ovpn_files/$provider | wc -l) -eq 0 ];then 
             clear
-            echo "VPN currently busy, please wait..."
+            echo "No VPN profiles in this folder!"
             sleep 2
-        done
-        echo $provider > $vpn_path/providers.txt
-        touch $vpn_path/custom
-        if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+            countrynumber=0
+        else
+            while [ -f $vpn_path/custom ];do
+                clear
+                echo "VPN currently busy, please wait..."
+                sleep 2
+            done
+            echo $provider > $vpn_path/providers.txt
+            touch $vpn_path/custom
+            if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+        fi
+    elif (( countrynumber == 0 ));then
+        echo "Returning to main menu..."
+    else
+        countryselection
     fi
-elif (( countrynumber == 0 ));then
-    echo "Returning to main menu..."
-else
-    countryselection
-fi
 }
 
 countrylocationselection () {
@@ -169,292 +168,316 @@ countrylocationselection () {
                 providers[$array_index]=$(echo $i | sed 's@'"$vpn_path"'\/ovpn_files\/@@g')
                 number=$(($number + 1))
                 array_index=$(($array_index + 1))
+            fi
+        done
+        pr -3 -t $vpn_path/tempmenu.txt
+        echo "0) Back to main menu"
+        echo ""
+        echo -n "Enter your choice and press [ENTER]: "
+        read countrynumber
+        re='^[0-9]+$'
+        if ! [[ $countrynumber =~ $re ]] ; then
+            echo "error: Not a number" >&2; countrylocationselection
         fi
-    done
-pr -3 -t $vpn_path/tempmenu.txt
-echo "0) Back to main menu"
-echo ""
-echo -n "Enter your choice and press [ENTER]: "
-read countrynumber
-re='^[0-9]+$'
-if ! [[ $countrynumber =~ $re ]] ; then
-   echo "error: Not a number" >&2; countrylocationselection
-fi
-if (( countrynumber >= 1 && countrynumber < number ));then
-    preciseselection
-elif (( countrynumber == 0 ));then
-    echo "Returning to main menu..."
-else
-    countrylocationselection
-fi
+        if (( countrynumber >= 1 && countrynumber < number ));then
+            preciseselection
+        elif (( countrynumber == 0 ));then
+            echo "Returning to main menu..."
+        else
+        countrylocationselection
+    fi
 }
 
 preciseselection () {
-# Selected country
-providersindex=$(($countrynumber -1))
-provider=${providers[$providersindex]}
-countryname=$(echo $provider | sed 's/Country_//g')
-clear
-logo
-echo ""
-echo "List of available locations in $countryname:"
-echo ""
-array_index=0
-number=1
-if [ -f $vpn_path/tempmenu.txt ];then rm $vpn_path/tempmenu.txt;fi
-# Look inside country folder
-for i in $(ls $vpn_path/ovpn_files/Country_$countryname);do
-    # Make sure that the location profile does not contain more than 3 digits (not a real city)
-    if [[ ! $i =~ [0-9]{2} ]] && [[ ! $i = [a-zA-Z]${countryname:1}.TCP.ovpn ]] && [[ ! $i = [a-zA-Z]${countryname:1}.ovpn ]];then
-        echo "$number) $i" | sed 's/.tcp//gi' | sed 's/.udp//gi' | sed 's/.ovpn//gi' | sed "s/$countryname.//g" | sed "s/[a-zA-Z][a-zA-Z][_-]//g" >> $vpn_path/tempmenu.txt
-        providers[$array_index]=$(echo $i | sed 's@'"$vpn_path"'\/ovpn_files\/@@g')
-        number=$(($number + 1))
-        array_index=$(($array_index + 1))
+    # Selected country
+    providersindex=$(($countrynumber -1))
+    provider=${providers[$providersindex]}
+    countryname=$(echo $provider | sed 's/Country_//g')
+    clear
+    logo
+    echo ""
+    echo "List of available locations in $countryname:"
+    echo ""
+    array_index=0
+    number=1
+    if [ -f $vpn_path/tempmenu.txt ];then rm $vpn_path/tempmenu.txt;fi
+    # Look inside country folder
+    for i in $(ls $vpn_path/ovpn_files/Country_$countryname);do
+        # Make sure that the location profile does not contain more than 3 digits (not a real city)
+        if [[ ! $i =~ [0-9]{2} ]] && [[ ! $i = [a-zA-Z]${countryname:1}.TCP.ovpn ]] && [[ ! $i = [a-zA-Z]${countryname:1}.ovpn ]];then
+            echo "$number) $i" | sed 's/.tcp//gi' | sed 's/.udp//gi' | sed 's/.ovpn//gi' | sed "s/$countryname.//g" | sed "s/[a-zA-Z][a-zA-Z][_-]//g" >> $vpn_path/tempmenu.txt
+            providers[$array_index]=$(echo $i | sed 's@'"$vpn_path"'\/ovpn_files\/@@g')
+            number=$(($number + 1))
+            array_index=$(($array_index + 1))
+        fi
+    done
+    if [ -f $vpn_path/tempmenu.txt ];then pr -3 -t $vpn_path/tempmenu.txt;fi
+    echo "0) Back"
+    echo ""
+    echo -n "Enter your choice and press [ENTER]: "
+    read selectionnumber
+    re='^[0-9]+$'
+    if ! [[ $selectionnumber =~ $re ]] ; then
+       echo "error: Not a number" >&2; countrylocationselection
     fi
-done
-if [ -f $vpn_path/tempmenu.txt ];then pr -3 -t $vpn_path/tempmenu.txt;fi
-echo "0) Back"
-echo ""
-echo -n "Enter your choice and press [ENTER]: "
-read selectionnumber
-re='^[0-9]+$'
-if ! [[ $selectionnumber =~ $re ]] ; then
-   echo "error: Not a number" >&2; countrylocationselection
-fi
-if (( selectionnumber >= 1 && selectionnumber < number ));then 
-   # Selected location
-    providersindex=$(($selectionnumber -1))
-    location=${providers[$providersindex]}
-    echo $provider,$location > $vpn_path/providers.txt
-    touch $vpn_path/custom
-    if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
-elif (( selectionnumber == 0 ));then
-    countrylocationselection
-else
-    countrylocationselection
-fi
+    if (( selectionnumber >= 1 && selectionnumber < number ));then 
+        # Selected location
+        providersindex=$(($selectionnumber -1))
+        location=${providers[$providersindex]}
+        echo $provider,$location > $vpn_path/providers.txt
+        touch $vpn_path/custom
+        if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+    elif (( selectionnumber == 0 ));then
+        countrylocationselection
+    else
+        countrylocationselection
+    fi
 }
 
 providerselection () {
-clear
-logo
-echo ""
-echo "List of available providers (and nb of servers):"
-echo ""
-array_index=0
-number=1
-for i in $(ls -d $vpn_path/ovpn_files/* | grep -v "Country_");do
-    nbovpn=$(ls $i | wc -l)
-    echo "$number) $(echo $i | xargs -n 1 basename) ($nbovpn)"
-    providers[$array_index]=$(echo $i | xargs -n 1 basename)
+    clear
+    logo
+    echo ""
+    echo "List of available providers (and nb of servers):"
+    echo ""
+    array_index=0
+    number=1
+    for i in $(ls -d $vpn_path/ovpn_files/* | grep -v "Country_");do
+        nbovpn=$(ls $i | wc -l)
+        echo "$number) $(echo $i | xargs -n 1 basename) ($nbovpn)"
+        providers[$array_index]=$(echo $i | xargs -n 1 basename)
         number=$(($number + 1))
         array_index=$(($array_index + 1))
-done
-echo "0) Back to main menu"
-echo ""
-echo -n "Enter your choice and press [ENTER]: "
-read providernumber
-re='^[0-9]+$'
-if ! [[ $providernumber =~ $re ]] ; then
-   echo "error: Not a number" >&2; providerselection
-fi
-if (( providernumber >= 1 && providernumber < number ));then
-    # Selected provider
-    providersindex=$(($providernumber -1))
-    provider=${providers[$providersindex]}
-    providername=$(echo $provider)
+    done
+    echo "0) Back to main menu"
+    echo ""
+    echo -n "Enter your choice and press [ENTER]: "
+    read providernumber
+    re='^[0-9]+$'
+    if ! [[ $providernumber =~ $re ]] ; then
+       echo "error: Not a number" >&2; providerselection
+    fi
+    if (( providernumber >= 1 && providernumber < number ));then
+        # Selected provider
+        providersindex=$(($providernumber -1))
+        provider=${providers[$providersindex]}
+        providername=$(echo $provider)
         while [ -f $vpn_path/custom ];do
             clear
             echo "VPN currently busy, please wait..."
             sleep 2
         done
-    echo $provider > $vpn_path/providers.txt
-    touch $vpn_path/custom
-    if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
-elif (( providernumber == 0 ));then
-    echo "Returning to main menu..."
-else
-    providerselection
-fi
+        echo $provider > $vpn_path/providers.txt
+        touch $vpn_path/custom
+        if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+    elif (( providernumber == 0 ));then
+        echo "Returning to main menu..."
+    else
+        providerselection
+    fi
 }
 
 status () {
-if [ -f $vpn_path/currentvpn.txt ];then
-    errors=$(tail -1 vpn.log | egrep -c '(Sequence Completed)')
-    waittime=0
-    while [ $errors -eq 0 ];do
-        clear
-        echo "Waiting for connection ($waittime/15)..."
-        tail -5 $vpn_path/vpn.log
-        sleep 2
+    if [ -f $vpn_path/currentvpn.txt ];then
         errors=$(tail -1 vpn.log | egrep -c '(Sequence Completed)')
-        waittime=$((waittime +1))
-        if [ $waittime -eq 15 ];then
-            rm $vpn_path/currentvpn.txt
-            rm $vpn_path/custom
-            stopVPN
-            break
-        fi
-    done
-    tail -5 $vpn_path/vpn.log
-    sleep 5
-else
-    echo "No connection to report yet, please try again in a few seconds..."
-    sleep 2
-fi
+        waittime=0
+        while [ $errors -eq 0 ];do
+            clear
+            echo "Waiting for connection ($waittime/15)..."
+            tail -5 $vpn_path/vpn.log
+            sleep 2
+            errors=$(tail -1 vpn.log | egrep -c '(Sequence Completed)')
+            waittime=$((waittime +1))
+            if [ $waittime -eq 15 ];then
+                rm $vpn_path/currentvpn.txt
+                rm $vpn_path/custom
+                stopVPN
+                break
+            fi
+        done
+        tail -5 $vpn_path/vpn.log
+        sleep 5
+    else
+        echo "No connection to report yet, please try again in a few seconds..."
+        sleep 2
+    fi
 }
 
 setup_droprange () {
-clear
-logo
-echo ""
-echo "Set up IPTABLES to drop traffic"
-echo ""
-echo "Enter the IP range to drop traffic from, typically your VPN gateway range:"
-echo "i.e. 192.168.3.0/24"
-echo ""
-touch $vpn_path/drop.txt
-read -p "Press enter to continue..."
-nano $vpn_path/drop.txt
+    clear
+    logo
+    echo ""
+    echo "Set up IPTABLES to drop traffic"
+    echo ""
+    echo "Enter the IP range to drop traffic from, typically your VPN gateway range:"
+    echo "i.e. 192.168.3.0/24"
+    echo ""
+    touch $vpn_path/drop.txt
+    read -p "Press enter to continue..."
+    nano $vpn_path/drop.txt
 }
 
 setup_profiles () {
-clear
-logo
-echo ""
-echo "Please enter the VPN provider's name (avoid spaces), followed by [ENTER]:"
-echo "(Example: HMA)"
-read vpn_name
-echo "Please enter the URL to OVPN files (zip), followed by [ENTER]:"
-echo "(Example: https://vpn.hidemyass.com/vpn-config/vpn-configs.zip)"
-read vpn_configs_url
-echo "Please enter the username you use for this VPN account, followed by [ENTER]:"
-read vpn_username
-echo "Please enter the password you use for this VPN account, followed by [ENTER]:"
-read vpn_password
-echo ""
-read -p "Is the above information correct? [Y/N]:" -n 1 -r
-if [[ ! $REPLY =~ ^[Nn]$ ]]
-then
-    if [ ! -d $vpn_path/vpn_profiles ];then mkdir $vpn_path/vpn_profiles/;fi
-    echo "vpn_name=$vpn_name" > $vpn_path/vpn_profiles/$vpn_name.txt
-    echo "vpn_configs_url=$vpn_configs_url" >> $vpn_path/vpn_profiles/$vpn_name.txt
-    echo "vpn_username=$vpn_username" >> $vpn_path/vpn_profiles/$vpn_name.txt
-    echo "vpn_password=$vpn_password" >> $vpn_path/vpn_profiles/$vpn_name.txt
+    clear
+    logo
     echo ""
-    echo "Profile created successfully!"
-    sleep 2
-fi
-echo ""
-read -p "Would you like to create another profile? [Y/N]:" -n 1 -r
-if [[ ! $REPLY =~ ^[Nn]$ ]]
-then
-    setup_profiles
-fi
-
-refresh
+    echo "Please enter the VPN provider's name (avoid spaces), followed by [ENTER]:"
+    echo "(Example: HMA)"
+    read vpn_name
+    echo "Please enter the URL to OVPN files (zip), followed by [ENTER]:"
+    echo "(Example: https://vpn.hidemyass.com/vpn-config/vpn-configs.zip)"
+    read vpn_configs_url
+    echo "Please enter the username you use for this VPN account, followed by [ENTER]:"
+    read vpn_username
+    echo "Please enter the password you use for this VPN account, followed by [ENTER]:"
+    read vpn_password
+    echo ""
+    read -p "Is the above information correct? [Y/N]:" -n 1 -r
+    if [[ ! $REPLY =~ ^[Nn]$ ]]
+    then
+        if [ ! -d $vpn_path/vpn_profiles ];then mkdir $vpn_path/vpn_profiles/;fi
+        echo "vpn_name=$vpn_name" > $vpn_path/vpn_profiles/$vpn_name.txt
+        echo "vpn_configs_url=$vpn_configs_url" >> $vpn_path/vpn_profiles/$vpn_name.txt
+        echo "vpn_username=$vpn_username" >> $vpn_path/vpn_profiles/$vpn_name.txt
+        echo "vpn_password=$vpn_password" >> $vpn_path/vpn_profiles/$vpn_name.txt
+        echo ""
+        echo "Profile created successfully!"
+        sleep 2
+    fi
+    echo ""
+    read -p "Would you like to create another profile? [Y/N]:" -n 1 -r
+    if [[ ! $REPLY =~ ^[Nn]$ ]]
+    then
+        setup_profiles
+    fi
+    refresh
 }
 
 edit_profiles () {
-clear
-logo
-echo ""
-echo "List of existing VPN profiles:"
-echo ""
-number=1
-for i in $(ls -d $vpn_path/vpn_profiles/*);do
-    nbprofiles=$(ls $i | wc -l)
-        echo "$number) $i" | sed 's@'"$vpn_path"'\/vpn_profiles\/@@g' | sed 's/.txt//g'
-        number=$(($number + 1))
-done
-echo "0) Back to main menu"
-echo ""
-echo -n "Choose the one you wish to edit and press [ENTER]: "
-read profilenumber
-if [ $profilenumber -eq 0 ];then
     clear
     logo
-    menu
-else
-    nano $(ls -d $vpn_path/vpn_profiles/* | sed -n $profilenumber\p)
-    refresh
-fi
-}
-
-delete_profiles () {
-clear
-logo
-echo ""
-echo "List of existing VPN profiles:"
-echo ""
-number=1
-for i in $(ls -d $vpn_path/vpn_profiles/*);do
-    nbprofiles=$(ls $i | wc -l)
-        echo "$number) $i" | sed 's@'"$vpn_path"'\/vpn_profiles\/@@g' | sed 's/.txt//g'
-        number=$(($number + 1))
-done
-echo "0) Back to main menu"
-echo ""
-echo -n "Choose the one you wish to delete and press [ENTER]: "
-read profilenumber
-if [ $profilenumber -eq 0 ];then
-    clear
-    logo
-    menu
-else
-    read -p "Are you sure you want to delete the $(ls -d $vpn_path/vpn_profiles/* | sed -n $profilenumber\p) profile? [Y/N]:" -n 1 -r
-    if [[ ! $REPLY =~ ^[Nn]$ ]]
-    then
-        rm $(ls -d $vpn_path/vpn_profiles/* | sed -n $profilenumber\p)
-        refresh
-    fi
-fi
-}
-
-choose_favorite () {
-clear
-logo
-echo ""
-if [ -f $vpn_path/favorites.txt ];then
-    echo "List of favorite VPN locations:"
+    echo ""
+    echo "List of existing VPN profiles:"
     echo ""
     number=1
-    cat $vpn_path/favorites.txt | while read line; do
-        echo "$number) $line"
+    for i in $(ls -d $vpn_path/vpn_profiles/*);do
+        nbprofiles=$(ls $i | wc -l)
+        echo "$number) $i" | sed 's@'"$vpn_path"'\/vpn_profiles\/@@g' | sed 's/.txt//g'
         number=$(($number + 1))
     done
     echo "0) Back to main menu"
     echo ""
-    echo -n "Choose the one you wish to launch and press [ENTER]: "
-    read favoritenumber
-    if [ $favoritenumber -gt 0 ];then 
-        while [ -f $vpn_path/custom ];do
-            clear
-            echo "VPN currently busy, please wait..."
-            sleep 2
-        done
-        sed ''"$favoritenumber"'q;d' $vpn_path/favorites.txt > $vpn_path/providers.txt
-        touch $vpn_path/custom
-        if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+    echo -n "Choose the one you wish to edit and press [ENTER]: "
+    read profilenumber
+    if [ $profilenumber -eq 0 ];then
+        clear
+        logo
+        menu
+    else
+        nano $(ls -d $vpn_path/vpn_profiles/* | sed -n $profilenumber\p)
+        refresh
     fi
-else
-    echo "Please create some favorites first by going into the 'VPN profiles management' menu"
+}
+
+delete_profiles () {
+    clear
+    logo
     echo ""
-    read -p "Press enter to continue"
-fi
+    echo "List of existing VPN profiles:"
+    echo ""
+    number=1
+    for i in $(ls -d $vpn_path/vpn_profiles/*);do
+        nbprofiles=$(ls $i | wc -l)
+        echo "$number) $i" | sed 's@'"$vpn_path"'\/vpn_profiles\/@@g' | sed 's/.txt//g'
+        number=$(($number + 1))
+    done
+    echo "0) Back to main menu"
+    echo ""
+    echo -n "Choose the one you wish to delete and press [ENTER]: "
+    read profilenumber
+    if [ $profilenumber -eq 0 ];then
+        clear
+        logo
+        menu
+    else
+        read -p "Are you sure you want to delete the $(ls -d $vpn_path/vpn_profiles/* | sed -n $profilenumber\p) profile? [Y/N]:" -n 1 -r
+        if [[ ! $REPLY =~ ^[Nn]$ ]]
+        then
+            rm $(ls -d $vpn_path/vpn_profiles/* | sed -n $profilenumber\p)
+            refresh
+        fi
+    fi
+}
+
+choose_favorite () {
+    clear
+    logo
+    echo ""
+    if [ -f $vpn_path/favorites.txt ];then
+        echo "List of favorite VPN locations:"
+        echo ""
+        number=1
+        cat $vpn_path/favorites.txt | while read line; do
+            echo "$number) $line"
+            number=$(($number + 1))
+        done
+        echo "0) Back to main menu"
+        echo ""
+        echo -n "Choose the one you wish to launch and press [ENTER]: "
+        read favoritenumber
+        if [ $favoritenumber -gt 0 ];then 
+            while [ -f $vpn_path/custom ];do
+                clear
+                echo "VPN currently busy, please wait..."
+                sleep 2
+            done
+            sed ''"$favoritenumber"'q;d' $vpn_path/favorites.txt > $vpn_path/providers.txt
+            touch $vpn_path/custom
+            if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+        fi
+    else
+        echo "Please create some favorites first by going into the 'VPN profiles management' menu"
+        echo ""
+        read -p "Press enter to continue"
+    fi
 }
 
 edit_favorites () {
-clear
-logo
-echo ""
-echo "** Instructions **"
-echo ""
-echo "# [VPN provider name],[.ovpn full name]"
-echo "# i.e. HMA,USA.TCP.ovpn"
-echo ""
-read -p "Press enter to continue"
-nano $vpn_path/favorites.txt
+    clear
+    logo
+    echo ""
+    echo "** Instructions **"
+    echo ""
+    echo "# [VPN provider name],[.ovpn full name]"
+    echo "# i.e. HMA,USA.TCP.ovpn"
+    echo ""
+    read -p "Press enter to continue"
+    nano $vpn_path/favorites.txt
+}
+
+update () {
+    # Check current version
+    currentversion=$(grep 'version_number=' VPN.sh | sed 's/^.*=//g')
+    # Check latest version number
+    latestversion=$(curl https://raw.githubusercontent.com/malwareinfosec/VPNrotator/master/version.info)
+    if (( currentversion == latestversion);then
+        echo "You already have the latest version ($latestversion)"
+    else
+        stopVPN
+        killservice
+        if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+        clear
+        # Download latest core files
+        declare -a CoreFiles=("VPN.sh" "countries.txt" "dn.sh" "up.sh" "vpnservice.sh" )
+        echo "Downloading latest core files..."
+        for val in ${CoreFiles[@]}; do
+            curl https://raw.githubusercontent.com/malwareinfosec/VPNrotator/master/$val --output $val
+        done
+        echo $latestversion > version.info
+        echo "Updated VPN Rotator to version: $latestversion"
+        echo "Please run VPN.sh to restart the VPN"
+        exit
+    fi
 }
 
 choice_actions () {
@@ -545,11 +568,18 @@ choice_actions () {
         stopVPN
         sleep 5
     fi
-
+    
     if [ $choice -eq 10 ];then
         clear
         logo
-        echo "Quitting VPN rotator..."
+        echo "Checking for VPN Rotator update..."
+        update
+    fi
+
+    if [ $choice -eq 11 ];then
+        clear
+        logo
+        echo "Quitting VPN Rotator..."
         stopVPN
         sleep 5
         killservice

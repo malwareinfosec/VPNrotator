@@ -24,7 +24,7 @@ for profile in $(ls $vpn_path/vpn_profiles/*);do
         echo "Cleaning up old ovpn files for $vpn_name..." >> $vpn_path/refresh.log
         rm $vpn_path/ovpn_files/$vpn_name/*.ovpn
     fi
-	
+    
     # Cleanup and setup temp directory
     echo "Delete temp folder..." >> $vpn_path/refresh.log
     rm -r $vpn_path/ovpn_tmp/
@@ -128,19 +128,15 @@ if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
 }
 
 killOVPN () {
- echo "Killing OVPN..."
-        for i in {1..4}; do killall openvpn;done
-        if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
+    echo "Killing OVPN..."
+    for i in {1..4}; do killall openvpn;done
+    if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
 }
 
 stopVPN () {
     echo "Disconnecting VPN..."
     for i in {1..4}; do killall openvpn;done
-        if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
-            #while [ -f stop ];do
-            #    echo "VPN has been stopped, waiting for signal to restart it..."
-            #    sleep 2
-            #done
+    if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
     rm currentvpn.txt
     rm stop
     increment
@@ -190,11 +186,11 @@ checkVPN () {
         if [ $errors -eq 0 ] || [ $pingcheck -eq 0 ];then
             echo "VPN DOWN!!!!!!, rotating now...."
             echo "Error with $location on $(date) errors=$errors pingcheck=$pingcheck"
-                    killOVPN
-                    rm vpn.log
-                    currentprovider
-                    startVPN
-                    #increment
+            killOVPN
+            rm vpn.log
+            currentprovider
+            startVPN
+            #increment
             sleep 20
             if [ -f $vpn_path/stop ];then
                 break
