@@ -461,7 +461,10 @@ update () {
     # Check latest version number
     latestversion=$(curl https://raw.githubusercontent.com/malwareinfosec/VPNrotator/master/version.info)
     if [[ ( "$currentversion" == "$latestversion" ) ]];then
+	    clear
+		logo
         echo "You already have the latest version ($latestversion)"
+        sleep 5
     else
         stopVPN
         killservice
