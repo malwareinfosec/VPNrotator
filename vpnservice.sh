@@ -111,10 +111,12 @@ for country in $(cat $vpn_path/countries.txt | awk -F ',' '{print $1}');do
     for i in ${line//,/ };do
         # Loop through VPN provider folders
         for folder in $( ls -ICountry_* $vpn_path/ovpn_files/);do
-            if ls $vpn_path/ovpn_files/$folder/$i*.ovpn >/dev/null 2>&1;then cp $vpn_path/ovpn_files/$folder/$i*.ovpn $vpn_path/ovpn_files/Country_$country/;fi
+            find $vpn_path/ovpn_files/$folder -iname "$i*" -exec cp {} $vpn_path/ovpn_files/Country_$country/ \;
         done
     done
 done
+# Clean up country mismatch
+find $vpn_path/ovpn_files/Country_UK -type f -iname ukraine* -exec rm -f {} \;
 
 echo "" >> $vpn_path/refresh.log
 echo "" >> $vpn_path/refresh.log

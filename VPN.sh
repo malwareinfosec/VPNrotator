@@ -11,7 +11,7 @@ refresh () {
     while [ -f $vpn_path/refresh ];do
         clear
         logo
-        echo "" 
+        echo ""
         echo "Refreshing VPN config files, please wait..."
         cat $vpn_path/refresh.log
         sleep 5
@@ -53,14 +53,15 @@ else
 fi
 echo ""
 echo "1) Check VPN connection status"
-echo "2) Start VPN from favorite location"
+echo "2) Start VPN from favorite"
 echo "3) Start VPN in new country"
-echo "4) Start VPN with new provider"
-echo "5) Rotate VPN"
-echo "6) Refresh VPN .ovpn files"
-echo "7) VPN profiles management"
-echo "8) Stop VPN (no internet connection)"
-echo "9) Quit VPN Rotator"
+echo "4) Start VPN in new city"
+echo "5) Start VPN with new provider"
+echo "6) Rotate VPN"
+echo "7) Refresh VPN .ovpn files"
+echo "8) VPN profiles management"
+echo "9) Stop VPN (no internet connection)"
+echo "10) Quit VPN Rotator"
 echo ""
 echo -n "Enter your choice and press [ENTER]: "
 }
@@ -89,7 +90,7 @@ if [ $choice -eq 1 ];then setup_profiles;fi
 if [ $choice -eq 2 ];then edit_profiles;fi
 if [ $choice -eq 3 ];then delete_profiles;fi
 if [ $choice -eq 4 ];then edit_favorites;fi
-if [ $choice -eq 0 ];then 
+if [ $choice -eq 0 ];then
     clear
     logo
     menu
@@ -119,8 +120,11 @@ echo "0) Back to main menu"
 echo ""
 echo -n "Enter your choice and press [ENTER]: "
 read countrynumber
-
-if [ $countrynumber -ne 0 ];then
+re='^[0-9]+$'
+if ! [[ $countrynumber =~ $re ]] ; then
+   echo "error: Not a number" >&2; countryselection
+fi
+if (( countrynumber >= 1 && countrynumber < number ));then
     # Selected country
     providersindex=$(($countrynumber -1))
     provider=${providers[$providersindex]}
@@ -141,6 +145,93 @@ if [ $countrynumber -ne 0 ];then
         touch $vpn_path/custom
         if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
     fi
+elif (( countrynumber == 0 ));then
+    echo "Returning to main menu..."
+else
+    countryselection
+fi
+}
+
+countrylocationselection () {
+    clear
+    logo
+    echo ""
+    echo "Pick a country:"
+    echo ""
+    array_index=0
+    number=1
+    if [ -f $vpn_path/tempmenu.txt ];then rm $vpn_path/tempmenu.txt;fi
+        for i in $(ls -d $vpn_path/ovpn_files/Country_*);do
+            # Only count ovpn profiles that do not contain 2 digits or more
+            nbovpn=$(ls $i | wc -l)
+            if [ $nbovpn -gt 0 ];then
+                echo "$number) $i" | sed 's@'"$vpn_path"'\/ovpn_files\/Country_@@g' >> $vpn_path/tempmenu.txt
+                providers[$array_index]=$(echo $i | sed 's@'"$vpn_path"'\/ovpn_files\/@@g')
+                number=$(($number + 1))
+                array_index=$(($array_index + 1))
+        fi
+    done
+pr -3 -t $vpn_path/tempmenu.txt
+echo "0) Back to main menu"
+echo ""
+echo -n "Enter your choice and press [ENTER]: "
+read countrynumber
+re='^[0-9]+$'
+if ! [[ $countrynumber =~ $re ]] ; then
+   echo "error: Not a number" >&2; countrylocationselection
+fi
+if (( countrynumber >= 1 && countrynumber < number ));then
+    preciseselection
+elif (( countrynumber == 0 ));then
+    echo "Returning to main menu..."
+else
+    countrylocationselection
+fi
+}
+
+preciseselection () {
+# Selected country
+providersindex=$(($countrynumber -1))
+provider=${providers[$providersindex]}
+countryname=$(echo $provider | sed 's/Country_//g')
+clear
+logo
+echo ""
+echo "List of available locations in $countryname:"
+echo ""
+array_index=0
+number=1
+if [ -f $vpn_path/tempmenu.txt ];then rm $vpn_path/tempmenu.txt;fi
+# Look inside country folder
+for i in $(ls $vpn_path/ovpn_files/Country_$countryname);do
+    # Make sure that the location profile does not contain more than 3 digits (not a real city)
+    if [[ ! $i =~ [0-9]{2} ]] && [[ ! $i = [a-zA-Z]${countryname:1}.TCP.ovpn ]] && [[ ! $i = [a-zA-Z]${countryname:1}.ovpn ]];then
+        echo "$number) $i" | sed 's/.tcp//gi' | sed 's/.udp//gi' | sed 's/.ovpn//gi' | sed "s/$countryname.//g" | sed "s/[a-zA-Z][a-zA-Z][_-]//g" >> $vpn_path/tempmenu.txt
+        providers[$array_index]=$(echo $i | sed 's@'"$vpn_path"'\/ovpn_files\/@@g')
+        number=$(($number + 1))
+        array_index=$(($array_index + 1))
+    fi
+done
+if [ -f $vpn_path/tempmenu.txt ];then pr -3 -t $vpn_path/tempmenu.txt;fi
+echo "0) Back"
+echo ""
+echo -n "Enter your choice and press [ENTER]: "
+read selectionnumber
+re='^[0-9]+$'
+if ! [[ $selectionnumber =~ $re ]] ; then
+   echo "error: Not a number" >&2; countrylocationselection
+fi
+if (( selectionnumber >= 1 && selectionnumber < number ));then 
+   # Selected location
+    providersindex=$(($selectionnumber -1))
+    location=${providers[$providersindex]}
+    echo $provider,$location > $vpn_path/providers.txt
+    touch $vpn_path/custom
+    if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+elif (( selectionnumber == 0 ));then
+    countrylocationselection
+else
+    countrylocationselection
 fi
 }
 
@@ -163,8 +254,11 @@ echo "0) Back to main menu"
 echo ""
 echo -n "Enter your choice and press [ENTER]: "
 read providernumber
-
-if [ $providernumber -ne 0 ];then
+re='^[0-9]+$'
+if ! [[ $providernumber =~ $re ]] ; then
+   echo "error: Not a number" >&2; providerselection
+fi
+if (( providernumber >= 1 && providernumber < number ));then
     # Selected provider
     providersindex=$(($providernumber -1))
     provider=${providers[$providersindex]}
@@ -176,7 +270,11 @@ if [ $providernumber -ne 0 ];then
         done
     echo $provider > $vpn_path/providers.txt
     touch $vpn_path/custom
-    if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi 
+    if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
+elif (( providernumber == 0 ));then
+    echo "Returning to main menu..."
+else
+    providerselection
 fi
 }
 
@@ -196,7 +294,7 @@ if [ -f $vpn_path/currentvpn.txt ];then
             rm $vpn_path/custom
             stopVPN
             break
-        fi 
+        fi
     done
     tail -5 $vpn_path/vpn.log
     sleep 5
@@ -273,7 +371,7 @@ echo "0) Back to main menu"
 echo ""
 echo -n "Choose the one you wish to edit and press [ENTER]: "
 read profilenumber
-if [ $profilenumber -eq 0 ];then 
+if [ $profilenumber -eq 0 ];then
     clear
     logo
     menu
@@ -299,7 +397,7 @@ echo "0) Back to main menu"
 echo ""
 echo -n "Choose the one you wish to delete and press [ENTER]: "
 read profilenumber
-if [ $profilenumber -eq 0 ];then 
+if [ $profilenumber -eq 0 ];then
     clear
     logo
     menu
@@ -394,7 +492,20 @@ choice_actions () {
         fi
     fi
 
-        if [ $choice -eq 4 ];then
+    if [ $choice -eq 4 ];then
+        countrylocationselection
+        if [ $countrynumber -eq 0 ] || [ $selectionnumber -eq 0 ];then
+            clear
+        else
+            clear
+            logo
+            echo "Starting VPN in $countryname $location..."
+            sleep 5
+            status
+        fi
+    fi
+
+        if [ $choice -eq 5 ];then
                 providerselection
         if [ $providernumber -eq 0 ];then
             clear
@@ -407,7 +518,7 @@ choice_actions () {
         fi
         fi
 
-    if [ $choice -eq 5 ];then
+    if [ $choice -eq 6 ];then
             touch $vpn_path/rotate
         clear
         logo
@@ -416,18 +527,18 @@ choice_actions () {
         status
     fi
 
-    if [ $choice -eq 6 ];then
+    if [ $choice -eq 7 ];then
         clear
         logo
         refresh
         sleep 2
     fi
 
-    if [ $choice -eq 7 ];then
+    if [ $choice -eq 8 ];then
         vpnprofilemanagement
     fi
 
-    if [ $choice -eq 8 ];then
+    if [ $choice -eq 9 ];then
         clear
         logo
         echo "Stopping VPN..."
@@ -435,7 +546,7 @@ choice_actions () {
         sleep 5
     fi
 
-    if [ $choice -eq 9 ];then
+    if [ $choice -eq 10 ];then
         clear
         logo
         echo "Quitting VPN rotator..."
@@ -457,7 +568,7 @@ choice_actions () {
 killservice
 
 # VPN Rotation version number
-version_number=2.4
+version_number=2.5
 
 # Adjust time
 timedatectl set-ntp false
