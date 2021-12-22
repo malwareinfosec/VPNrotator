@@ -457,7 +457,7 @@ edit_favorites () {
 
 update () {
     # Check current version
-    currentversion=$(grep 'version_number=' VPN.sh | sed 's/^.*=//g')
+    currentversion=$(grep '^version_number=' VPN.sh | sed 's/version_number=//g')
     # Check latest version number
     latestversion=$(curl https://raw.githubusercontent.com/malwareinfosec/VPNrotator/master/version.info)
     if (( currentversion == latestversion ));then
