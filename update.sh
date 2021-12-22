@@ -1,6 +1,6 @@
 #!/bin/bash
 # Check version number
-latestversion=$(curl https://raw.githubusercontent.com/malwareinfosec/EKFiddle/master/Regexes/RegexesVersion.info)
+latestversion=$(curl https://raw.githubusercontent.com/malwareinfosec/VPNrotator/master/version.info)
 # Download latest core files
 declare -a CoreFiles=("VPN.sh" "countries.txt" "dn.sh" "up.sh" "vpnservice.sh" )
 for val in ${CoreFiles[@]}; do
