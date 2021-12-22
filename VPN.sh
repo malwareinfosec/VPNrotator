@@ -460,7 +460,7 @@ update () {
     currentversion=$(grep '^version_number=' VPN.sh | sed 's/version_number=//g')
     # Check latest version number
     latestversion=$(curl https://raw.githubusercontent.com/malwareinfosec/VPNrotator/master/version.info)
-    if (( currentversion == latestversion ));then
+    if [[ ( "$currentversion" == "$latestversion" ) ]];then
         echo "You already have the latest version ($latestversion)"
     else
         stopVPN
