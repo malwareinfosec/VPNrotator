@@ -34,6 +34,8 @@ killOVPN () {
 logo () {
     echo "#####################################"
     echo "######## VPN ROTATOR v.$version_number  #########"
+    echo "#####################################"
+    echo "Current system time: $(date +%H:%M)"
     if [ -f $vpn_path/drop.txt ];then
         echo "VPN gateway range: $(cat $vpn_path/drop.txt)"
     else
@@ -46,7 +48,7 @@ menu () {
     echo ""
     if [ -f $vpn_path/currentvpn.txt ];then
         echo "Currently connected to: $(cat currentvpn.txt)"
-        echo "Connection established on $(date)"
+        echo "Connection established on $(cat date.log)"
     else
         echo "** Not currently connected to the VPN **"
     fi
@@ -262,11 +264,6 @@ providerselection () {
         providersindex=$(($providernumber -1))
         provider=${providers[$providersindex]}
         providername=$(echo $provider)
-        while [ -f $vpn_path/custom ];do
-            clear
-            echo "VPN currently busy, please wait..."
-            sleep 2
-        done
         echo $provider > $vpn_path/providers.txt
         touch $vpn_path/custom
         if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
@@ -425,12 +422,7 @@ choose_favorite () {
         echo ""
         echo -n "Choose the one you wish to launch and press [ENTER]: "
         read favoritenumber
-        if [ $favoritenumber -gt 0 ];then 
-            while [ -f $vpn_path/custom ];do
-                clear
-                echo "VPN currently busy, please wait..."
-                sleep 2
-            done
+        if [ $favoritenumber -gt 0 ];then
             sed ''"$favoritenumber"'q;d' $vpn_path/favorites.txt > $vpn_path/providers.txt
             touch $vpn_path/custom
             if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
@@ -601,7 +593,7 @@ choice_actions () {
 killservice
 
 # VPN Rotation version number
-version_number=2.5
+version_number=2.6
 
 # Adjust time
 timedatectl set-ntp false
@@ -637,6 +629,6 @@ do
     clear
     logo
     menu
-    read choice
+    read -t 60 choice
     choice_actions
 done
