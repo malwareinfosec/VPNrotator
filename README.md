@@ -11,7 +11,13 @@ The VPN rotator is a VM (or physical machine) that sends and receives all the tr
 
 This project found its name (VPN Rotator) in the act of rotating or cycling through VPN locations to reproduce malware traffic. As such, it is easy to rotate within countries for the same or multiple VPN providers. This allows you to add accounts for several different providers and seamlessly rotate within access points, without having to use their proprietary software.
 
+## Virtual rotator
+
 ![alt text](https://github.com/malwareinfosec/vpnrotator/blob/master/img/rotator_diagram.png)
+
+## Physical rotator
+
+![alt text](https://github.com/malwareinfosec/vpnrotator/blob/master/img/pi.png)
 
 ## Requirements
 
@@ -53,7 +59,7 @@ Standard System utilities
 
 `apt-get update`
 
-`apt-get install psmisc unzip openvpn curl dos2unix`
+`apt-get install psmisc unzip openvpn curl dos2unix iptables-persistent`
 
 ## 4) Configure /etc/network/interfaces
 
