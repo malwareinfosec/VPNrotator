@@ -21,7 +21,7 @@ This project found its name (VPN Rotator) in the act of rotating or cycling thro
 
 ## Requirements
 
-- Virtual or bare metal machine
+- Virtual or bare metal machine (can be done on a Raspberry Pi w/ 2 ethernet ports running Raspbian OS)
 - One or more commercial VPN accounts
 
 ## 1) Create new VM
