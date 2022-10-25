@@ -24,7 +24,7 @@ refreshVPN () {
             echo "Cleaning up old ovpn files for $vpn_name..." >> $vpn_path/refresh.log
             rm $vpn_path/ovpn_files/$vpn_name/*.ovpn
         fi
-        
+
         # Cleanup and setup temp directory
         echo "Delete temp folder..." >> $vpn_path/refresh.log
         rm -r $vpn_path/ovpn_tmp/
@@ -74,7 +74,7 @@ refreshVPN () {
             for i in $(ls $vpn_path/ovpn_files/$vpn_name/*.ovpn);do sed -i "s@auth-user-pass@auth-user-pass $vpn_path\/ovpn_files\/$vpn_name\/user.txt@g" $i;done
             for i in $(ls $vpn_path/ovpn_files/$vpn_name/*.ovpn);do echo "" >> $i;done
             for i in $(ls $vpn_path/ovpn_files/$vpn_name/*.ovpn);do echo "log $vpn_path/vpn.log" >> $i;done
-            
+
             echo "Successfully imported $vpn_name profile!" >> $vpn_path/refresh.log
             echo "" >> $vpn_path/refresh.log
             else
@@ -256,6 +256,7 @@ do
     if [ -f rotate ];then
         echo "Rotating IP address..."
         killOVPN
+        rm off
         rm vpn.log
         if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
         currentprovider
@@ -269,6 +270,7 @@ do
     if [ -f custom ];then
         echo "Starting new VPN connection..."
         killOVPN
+        rm off
         rm vpn.log
         if [ -f currentvpn.txt ];then rm currentvpn.txt;fi
         if [ -f start ];then rm start;fi
@@ -292,17 +294,21 @@ do
 
     if [ -f stop ];then
         stopVPN
+        touch off
     fi
 
     # Check if VPN is down
-    if [ $downcheck -eq 60 ];then
-        echo "Checking VPN at $(date)" >> error.log
-        downcheck=0
-        checkVPN
+    if [ -f off ];then
+        echo "VPN has not started or is off"
     else
-        downcheck=$((downcheck+1))
+        if [ $downcheck -eq 60 ];then
+            echo "Checking VPN at $(date)" >> error.log
+            downcheck=0
+            checkVPN
+        else
+            downcheck=$((downcheck+1))
+        fi
     fi
-
     sleep 2
 
 done

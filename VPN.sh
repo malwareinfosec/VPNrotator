@@ -563,7 +563,7 @@ choice_actions () {
         stopVPN
         sleep 5
     fi
-    
+
     if [ $choice -eq 10 ];then
         clear
         logo
@@ -593,7 +593,7 @@ choice_actions () {
 killservice
 
 # VPN Rotation version number
-version_number=2.6
+version_number=2.7
 
 # Adjust time
 timedatectl set-ntp false
