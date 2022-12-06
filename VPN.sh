@@ -575,9 +575,6 @@ choice_actions () {
     fi
 
     if [ $choice -eq 10 ];then
-        clear
-        logo
-        echo "Checking for VPN Rotator update..."
         updatecheck
     fi
 
