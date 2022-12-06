@@ -448,6 +448,7 @@ edit_favorites () {
 }
 
 updatecheck () {
+    clear
     logo
     # Check current version
     currentversion=$(grep '^version_number=' VPN.sh | sed 's/version_number=//g')
