@@ -593,7 +593,7 @@ choice_actions () {
 killservice
 
 # VPN Rotation version number
-version_number=2.7
+version_number=2.8
 
 # Adjust time
 timedatectl set-ntp false
