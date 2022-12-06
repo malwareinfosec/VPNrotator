@@ -32,7 +32,7 @@ Monaco
 Morocco
 Netherlands,nl_,nl-,nl[0-9]
 Norway,no-,no_,no[0-9]
-New Zealand,nz
+NewZealand,nz
 Pakistan
 Palestine
 Peru
