@@ -447,17 +447,27 @@ edit_favorites () {
     nano $vpn_path/favorites.txt
 }
 
-update () {
+updatecheck () {
+    logo
     # Check current version
     currentversion=$(grep '^version_number=' VPN.sh | sed 's/version_number=//g')
     # Check latest version number
-    latestversion=$(curl https://raw.githubusercontent.com/malwareinfosec/VPNrotator/master/version.info)
+    latestversion=$(curl -s https://raw.githubusercontent.com/malwareinfosec/VPNrotator/master/version.info)
     if [[ ( "$currentversion" == "$latestversion" ) ]];then
-	    clear
-		logo
-        echo "You already have the latest version ($latestversion)"
-        sleep 5
+            clear
+                logo
+        echo "You are running the latest version of the VPNrotator ($latestversion)..."
+        sleep 2
     else
+        read -p "An update for the VPNrotator is available, would you like to install it? [Y/N]" -n 1 -r
+        if [[ ! $REPLY =~ ^[Nn]$ ]]
+        then
+            updateperform
+        fi
+    fi
+}
+
+updateperform () {
         stopVPN
         killservice
         if [ -f $vpn_path/stop ];then rm $vpn_path/stop;fi
@@ -472,7 +482,6 @@ update () {
         echo "Updated VPN Rotator to version: $latestversion"
         echo "Please run VPN.sh to restart the VPN"
         exit
-    fi
 }
 
 choice_actions () {
@@ -568,7 +577,7 @@ choice_actions () {
         clear
         logo
         echo "Checking for VPN Rotator update..."
-        update
+        updatecheck
     fi
 
     if [ $choice -eq 11 ];then
@@ -616,6 +625,9 @@ fi
 # Clean up
 if [ -f $vpn_path/currentvpn.txt ];then rm $vpn_path/currentvpn.txt;fi
 clear
+
+# Check for VPNrotator update
+updatecheck
 
 # Start vpn service
 bash $vpn_path/vpnservice.sh &>/dev/null &
