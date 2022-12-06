@@ -65,7 +65,9 @@ Standard System utilities
 
 `nano /etc/network/interfaces`
 
-** Edit with the name of your ethernet cards and IP range **
+**Note: to go for an easy configuration, you can simply set your first network interface to dhcp (instead of static).**
+
+**Edit with the name of your ethernet cards and IP range**
 (type `ip link show` to reveal the name of your ethernet cards)
 
         # The loopback network interface
