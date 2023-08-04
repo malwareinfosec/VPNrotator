@@ -600,7 +600,7 @@ choice_actions () {
 killservice
 
 # VPN Rotation version number
-version_number=2.8
+version_number=2.9
 
 # Adjust time
 timedatectl set-ntp false
@@ -622,6 +622,9 @@ fi
 
 # Clean up
 if [ -f $vpn_path/currentvpn.txt ];then rm $vpn_path/currentvpn.txt;fi
+if [ -f $vpn_path/rotate ];then rm $vpn_path/rotate;fi
+if [ -f $vpn_path/custom ];then rm $vpn_path/custom;fi
+if [ -f $vpn_path/tempmenu.txt ];then rm $vpn_path/tempmenu.txt;fi
 clear
 
 # Check for VPNrotator update
